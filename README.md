@@ -45,12 +45,12 @@ $$D(x) = 1 + x^{10}$$
 
 Now suppose that I suggest you multiply them all together, you'll get something like
 
-$$USC(x) = P(x)N(x)D(x) = $$
+$$USD(x) = P(x)N(x)D(x) = $$
 $$1 + x + x^2 + x^3 + x^4 + 2x^5 + 2x^6 + 2x^7 + 2x^8 + 2x^9 + 4x^{10} +$$
 $$3x^{11} + 3x^{12} + 3x^{13} + 3x^{14} + 4x^{15} + 3x^{16} + 3x^{17} + 3x^{18} + 3x^{19} + 4x^{20} +$$
 $$2x^{21} + 2x^{22} + 2x^{23} + 2x^{24} + 2x^{25} + x^{26} + x^{27} + x^{28} + x^{29} + x^{30}$$
 
-If you consider the coefficient for $x^{10}$, namely $4$, you might notice that there are *4* distinct ways to give change for $0.10 in $USC$: 10 pennies, 5 pennies and 1 nickel, 2 nickels, and finally 1 dime. This is no coincidence, as it corresponds exactly to how polynomial products work.
+If you consider the coefficient for $x^{10}$, namely $4$, you might notice that there are *4* distinct ways to give change for $0.10 in the US dollar: 10 pennies, 5 pennies and 1 nickel, 2 nickels, and finally 1 dime. This is no coincidence, as it corresponds exactly to how polynomial products work.
 
 In this sense, the coefficient for a given power of $x$ in any polynomial product is an answer to the question "how many unique ways can the terms of the starting polynomials combine to achieve this power of $x$ (scaled by initial coefficients)?" This actually genuinely surprised me to learn, but **polynomial multiplication is a form of [convolution](https://en.wikipedia.org/wiki/Convolution)**. This will come up again later.
 
@@ -85,7 +85,7 @@ $$\Big(\frac{1+x+x^2+x^3+x^4}{1+x+x^2+x^3+x^4}\Big)\Big(\frac{1}{1-x}\Big)=(1+x+
 What this component of our polynomial product really represents is whether or not our particular currency has a 'unit coin'. That $(1+x+x^2+x^3+x^4)$ portion of this product captures the only means of achieving an exponent that is not a multiple of $5$. This corresponds exactly with the idea that if our currency doesn't have a unit coin, (the Canadian dollar for instance), that there would be no way to combine individual components of the generating functions to achieve a power of $x$ of $1$.
 
 ### The rest of the denominations
-For now, we will tuck that 'unit coin polynomial' away for now to focus on the *remainder* of the products
+For now, we will tuck that 'unit coin polynomial' away to focus on the *remainder* of the products
 
 $$\Big(\frac{1}{1-x^5}\Big)^2\frac{1}{1-x^{10}}\frac{1}{1-x^{25}}\frac{1}{1-x^{50}}\frac{1}{1-x^{100}}$$
 
@@ -101,7 +101,9 @@ Next we can take all those extracted polynomial numerators and expand them into 
 
 $$1+2x^5+4x^{10}+6x^{15}+9x^{20}+13x^{25}+...+980x^{195}+985x^{200}+985x^{205}+980x^{210}+...+13x^{380}+9x^{385}+6x^{390}+4x^{395}+2x^{400}+x^{405}$$
 
-You *could* multiply in the 'unit coin polynomial' now, but the effect would be to "stretch" the 'remainder polynomial' out, duplicating its coefficients by a factor of the number of terms of the 'unit coin polynomial'. **It is in this way that extracting that 5 term unit coin polynomial lets us contract a 406 term polynomial into an 82 term polynomial.** This is a necessary optimization as we will see later.
+This polynomial has 82 terms! Notice that since all of the starting generator functions' coefficients were symmetric, the resulting polynomial is also perfectly symmetric.
+
+You *could* multiply in the 'unit coin polynomial' now, but the effect would be to "stretch" the 'remainder polynomial' out, duplicating its coefficients by a factor of the number of terms of the 'unit coin polynomial'. **It is in this way that extracting that 5 term unit coin polynomial lets us contract a 410 term polynomial by a factor of 5 into an 82 term polynomial.** This is an important optimization as we will see later.
 
 ### Generalized geometric sum
 There is also a more generalized form of the geometric sum above which uses [binomial coefficient notation](https://en.wikipedia.org/wiki/Binomial_coefficient), a version raised to a power $n$ like this
