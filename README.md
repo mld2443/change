@@ -147,7 +147,7 @@ uint64_t analyticWaysToGiveChange(uint64_t amount) const {
 
 In my code above, `nCk(n, k)` is ${n \choose k}$. This works for any amount, but eagle-eyed reeders would notice that there are a lot of magic numbers in there and that I misspelled 'readers'. There's a few more loose ends to tie up before reaching a final algorithm.
 
-<details><summary><strong>Loose ends</strong></summary>
+## Loose ends
 
 ### The skeleton in the closet
 Remember earlier when a hypothetical reader pointed out that "straight polynomial multiplication is $O(d_1d_2)$"? These are sparse polynomials, meaning they contain low information, but multiplying is still not trivial. Some shortcuts can be taken, but ultimately, it's just a much longer form of FOIL.
@@ -175,7 +175,6 @@ This idea can be captured by finding the [greatest common divisor](https://en.wi
 I find this last fact somewhat amusing considering that this is a speedup employed earlier to make the math easier to do by hand. In similar situations usually it is a complication to employ such tricks as computers can often be faster than such optimizations through sheer brute force.
 
 This is unfortunately not one of those times. To give a taste of some numbers, when constructing the finite polynomial for the USD, our polynomial can be contracted down to a manageable ~16,000 coefficients. The Euro, however, which cannot be contracted since its GCD is 1 cent, has more than 1.4 million coefficients in its finite polynomial.
-</details>
 
 ## Why would you think to do this in order to solve this problem?
 The Mathologer video credits Graham, Knuth, and Patashnik's [*Concrete Mathematics*](https://en.wikipedia.org/wiki/Concrete_Mathematics) for inspiring the use of generating functions and indeed chapter 7.1 is all about this *exact* application for generating functions. While all of those authors are accomplished mathematicians, the preface of the book explains the provenance for its material reaching even further back in time.
@@ -213,17 +212,16 @@ The Fourier Transform is so interrelated with so many areas of mathematics that 
 
 Though I've used the FFT before, this is the first time I've written one myself. This is what I would have liked to know before using the FFT.
 
-<details><summary><b><i>Quick</i> disambiguation of topics from Fourier transforms for those unfamiliar</b></summary>
+## *Quick* disambiguation of topics from Fourier transforms for those unfamiliar
 
-## Fourier series and analysis
+### Fourier series and analysis
 A [Fourier series](https://en.wikipedia.org/wiki/Fourier_series) is the summation of signals, (sinusoids, frequencies, etc.) used in [Fourier analysis](https://en.wikipedia.org/wiki/Fourier_analysis) which is what most people likely think about when they think of Joseph Fourier. These infinite sums of sinusoidal signals can be truncated to approximate arbitrary functions, evaluating only finitely many. If you are familiar with [animations involving vectors aligned tip-to-tail spinning to trace out complex patterns](https://youtu.be/-qgreAUpPwM), these are accomplished using Fourier series approximations.
 
 The series and its function approximations can be created using the Fourier transform.
 
-## The (continuous) Fourier transform
+### The (continuous) Fourier transform
 The [Fourier transform](https://en.wikipedia.org/wiki/Fourier_transform) is a formula used to express a continuous 'input' function $f(x)$ as a continuous 'output' function $\widehat{f}(\xi)$ which describes the *frequencies* of the input.
 
-<details><summary><b>The gist of how the Fourier transform works</b></summary>
 The formula for the transform looks like
 
 $$\widehat{f}(\xi)=\int_{-\infty}^\infty f(x)e^{-i2\pi\xi x}dx$$
@@ -231,28 +229,26 @@ $$\widehat{f}(\xi)=\int_{-\infty}^\infty f(x)e^{-i2\pi\xi x}dx$$
 The transform works by using [Euler's formula](https://en.wikipedia.org/wiki/Euler's_formula) to "wind" the input around the origin of the complex plane and finding the "center of mass" so to speak (the integral). That "center of mass" for a given $\xi$ (greek xi, the frequency of the winding) is $\widehat{f}(\xi)$. By changing $\xi$, the transform "winds" $f(x)$ tighter or more loosely and the "center of mass" moves, $\widehat{f}(\xi)$ changes. When $\widehat{f}(\xi)$ is very near the origin, $f(x)$ has low correlation with this particular "winding", $\xi$, and when the center is far from the origin, there is high correlation.
 
 For an animated explanation of the above, I recommend [this 3Blue1Brown video](https://youtu.be/spUNpyF58BY) for FT novices like I was.
-</details>
 
-While the domain of $f(x)$ can be either $\R$ or $\Complex$, $\widehat{f}(\xi)$ is a complex output; the magnitude encodes the strength of the correlation, and the [argument](https://en.wikipedia.org/wiki/Argument_(complex_analysis)) of $\widehat{f}(\xi)$ encodes the phase. If your data are all in phase, however, it is common to discard the imaginary component.
+While the domain of $f(x)$ can be either $\Real{}$ or $\Complex{}$, $\widehat{f}(\xi)$ is a complex output; the magnitude encodes the strength of the correlation, and the [argument](https://en.wikipedia.org/wiki/Argument_(complex_analysis)) of $\widehat{f}(\xi)$ encodes the phase. If your data are all in phase, however, it is common to discard the imaginary component.
 
-## The discrete Fourier transform
+### The discrete Fourier transform
 The [Discrete Fourier transform](https://en.wikipedia.org/wiki/Discrete_Fourier_transform) (conventionally denoted calligraphic F, $\mathcal{F}$) does the same thing as its continuous counterpart using discrete inputs (usually called samples) to extract discrete frequencies. The DFT is effectively the same formula as the FT but swapping an integral for a summation, and operating on discrete (usually *finite*) inputs instead of continuous functions. The number of discrete frequencies it can extract is equivalent to the number of input samples.
 
 While the continuous Fourier transform is more commonly thought of as a **formula**, the DFT can be considered as both a formula and an **algorithm**. A DFT computes the sum of $N$ inputs "evaluated" at $N$ distinct points to yield $N$ outputs. A naive approach to "evaluate" $N$ inputs at $N$ points would be $O(N^2)$.
 
-## Inverse DFT
+### Inverse DFT
 This is a function that does what it says on the tin, in particular it satisfies the following: $\mathcal{F}^{-1}(\mathcal{F}(f))=f$ for input function $f$. When *computing* $\mathcal{F}$ and $\mathcal{F}^{-1}$, (perhaps surprisingly) there is very little distinction between the two (just one exponent). For this reason they are sometimes treated as the same operation, particularly in the context of computing. This remains true for the FFT.
 
-## The FFT
+### The FFT
 The [fast Fourier transform](https://en.wikipedia.org/wiki/Fast_Fourier_transform) is a family of algorithms to calculate the DFT. While the FFT is still named after Joseph Fourier, the algorithms were first invented some time in the 19th or 20th century well after his death.
 
 The simplest and most common version is [the Cooley-Tukey FFT](https://en.wikipedia.org/wiki/Cooley–Tukey_FFT_algorithm) which uses a divide-and-conquer approach to exploit symmetry by evaluating the inputs on the [roots of unity](https://en.wikipedia.org/wiki/Root_of_unity). What's clever is that **using the roots of unity as its evaluation points is what induces that symmetry**. The intuition for how this works can be seen in [this video from Reducible](https://youtu.be/h7apO7q16V0), but the gist is that it takes the $O(N^2)$ run time down to $O(N\log(N))$.
 
 In practice, the FFT is a complete drop-in replacement for the DFT in many applications; it is rare to find a use-case where the general DFT is necessary over the FFT.
-</details>
 
 ## The FFT and polynomials
-I was always so used to the Fourier transform being the "signal processing" function that when I first learned that it could be used to multiply polynomials, I was a little surprised. Now, it is practically the definition of what the FFT allows for. To understand how, first we need to know two quirks about polynomial multiplication.
+I was always so used to the Fourier transform being the "signal processing" function that when I first learned that it could be used to multiply polynomials, I was a little surprised. Now for me, it is practically the definition of what the FFT is. To understand how, first we need to know two quirks about polynomial multiplication.
 
 ### Linearity
 For two polynomials $f(x)$ and $g(x)$ and any input value $i$, multiplying the outputs $f(i)$ and $g(i)$ together is equivalent to evaluating on the combined multiplied polynomial, e.g. $f(x)\times g(x)=(f\times g)(x)$.
