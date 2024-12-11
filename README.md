@@ -25,7 +25,7 @@ Any mathematician or computer scientist can appreciate the joy of taking a $O(..
 
 While not every problem has an analytic solution, when one exists it is often the best, fastest, canonically preferred means of solving such a problem. Having experience with the dynamic programming solution to the change-making problem, I'd always guessed there could be a more analytic solution to the problem, some sort of formula where you plug in the monetary amount and it just returns an answer never fussing with recursion or memoization. This intuition comes from a plot of the dynamic programming function.
 
-> image of table of values
+![The counts up to $1 USD](https://github.com/user-attachments/assets/ccf20e12-aaae-4f55-aafe-2afe2fe092b2)
 
 You'll quickly notice (for USD) that the number of ways to make change only increases on $0.05 increments, and further still, it looks like there *could* be some sort of pattern there too for the dime and quarter and so on... The numbers grow with each denomination in surprising ways, and yes **there is an exploitable pattern**.
 
