@@ -18,6 +18,8 @@ Another "problem" with that vast improvement, (for the specific case of the *nth
 
 There is an argument to be made that the recursive approach avoids loss of precision, however, the unfortunate truth is that this too is bested by an even more fool-proof method: the humble lookup table. For all the clever approaches to calculating a Fibonacci number, there's none faster, more accurate, or more straightforward. The $O(\phi^n)$ growth means that any method used would quickly reach the limit of even 64-bit unsigned integers; a lookup table needs only 93 entries (assuming the zeroth entry starts at 0) with the final being $[92]=7,540,113,804,746,346,429$.
 
+While it just so happens that the Fibonacci lookup table corellates 1 to 1 with the dynamic approach, this is possibly the only case where that is true.
+
 ### Analytic solutions
 Any mathematician or computer scientist can appreciate the joy of taking a $O(...)$ problem and deriving a $O(1)$ solution. I've heard this called an "analytic solution" before which seems appropriate, however it's not the exact same as [the mathematical definition of the same-named class of expressions](https://en.wikipedia.org/wiki/Closed-form_expression#Comparison_of_different_classes_of_expressions) since this definition necessarily involves a complexity analysis (mathematically speaking, the recursive solution is a single finite sum of ones for any given input, making it an algebraic expression). Nevertheless, I use the name here for the sake of brevity.
 
