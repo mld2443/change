@@ -101,7 +101,7 @@ Next we can take all those extracted polynomial numerators and expand them into 
 
 $$1+2x^5+4x^{10}+6x^{15}+9x^{20}+13x^{25}+...+980x^{195}+985x^{200}+985x^{205}+980x^{210}+...+13x^{380}+9x^{385}+6x^{390}+4x^{395}+2x^{400}+x^{405}$$
 
-This polynomial has 82 terms! Notice that since all of the starting generator functions' coefficients were symmetric, the resulting polynomial is also perfectly symmetric.
+This polynomial has 82 terms! Notice that since all of the starting generator functions' coefficients were symmetric, the resulting polynomial's coefficients are also perfectly symmetric.
 
 You *could* multiply in the 'unit coin polynomial' now, but the effect would be to "stretch" the 'remainder polynomial' out, duplicating its coefficients by a factor of the number of terms of the 'unit coin polynomial'. **It is in this way that extracting that 5 term unit coin polynomial lets us contract a 410 term polynomial by a factor of 5 into an 82 term polynomial.** This is an important optimization as we will see later.
 
@@ -110,7 +110,12 @@ There is also a more generalized form of the geometric sum above which uses [bin
 
 $$\sum_{i=0}^{\infty}{{n-1+i}\choose{n-1}}x^i={{n-1}\choose{n-1}}+{{n}\choose{n-1}}x+{{n+1}\choose{n-1}}x^2+...=\frac{1}{(1-x)^n}$$
 
-again only for $-1<x<1$. This formula looks like a nice fit for the polynomial product above if we swap $x$ for $x^{100}$ and $n=6$. For our initial case of US coinage, we finally, *finally* end with the product of three things, the finite 5 term 'unit coin polynomial', the finite 81 term 'remainder polynomial', and a new infinite polynomial sum that altogether looks like this
+again only for $-1<x<1$. This formula looks like a nice fit for the polynomial product above if we swap $x$ for $x^{100}$ and $n=6$. For our initial case of US coinage, we finally, *finally* end with the product of three things:
+1. the finite 5 term 'unit coin polynomial'
+2. the finite 81 term 'remainder polynomial'
+3. an infinite polynomial sum
+
+Altogether, it looks like this
 
 $$(1+x+x^2+x^3+x^4)\times$$
 $$(1+2x^5+4x^{10}+6x^{15}+9x^{20}+13x^{25}+18x^{30}+...+x^{405})\times$$
