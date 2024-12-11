@@ -128,13 +128,13 @@ $$(1+...)\times$$
 $$(1+...+287x^{100}+...+985x^{200}+...325x^{300}+...2x^{400}+...)\times$$
 $$[{5\choose5}+{6\choose5}x^{100}+{7\choose5}x^{200}+{8\choose5}x^{300}+{9\choose5}x^{400}+...]$$
 
-For all possible input amounts, there is always one and only one relevant term in the first polynomial, so it can be completely ignored for now. Notice how the answer can be given by multiplying and combining the remaining visible terms
+For all possible input amounts, there is always one and *only* one relevant term in the first polynomial, and since all the rest of the powers of x are multiples of 5, all inputs can be rounded down to the nearest 5 and the unit polynomial can be ignored entirely. Notice how the answer can be given by multiplying and combining the remaining visible terms
 
 $$1{9\choose5}x^{400}+287x^{100}{8\choose5}x^{300}+985x^{200}{7\choose5}x^{200}+325x^{300}{6\choose5}x^{100}+{5\choose5}2x^{400}$$
 
-the variables all combine to $x^{400}$ except it isn't relevant anymore so we can remove it for clarity
+The variables all combine to $x^{400}$ except it isn't relevant anymore so we can remove it for clarity
 
-$${9\choose5}+287{8\choose5}+985{7\choose5}+325{6\choose5}+{5\choose5}=38,835$$
+$${9\choose5}+287{8\choose5}+985{7\choose5}+325{6\choose5}+2{5\choose5}=38,835$$
 
 and therefore there are 38,835 ways to give change for $4.00 USD. That's it! Having a finite polynomial up front allows us to limit the search for coefficients in the infinite polynomial. For *any* non-negative integer amount, to find the number of ways to give change, you only need to find all the ways to combine these terms of the infinite polynomial **over the range of the finite polynomial**, and it extends in a very manageable way.
 
