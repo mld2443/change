@@ -1,4 +1,4 @@
-In this write-up for all the surprises I encountered trying to be clever with the making change problem, I will describe the techniques I learned along the way, including two surprises: generating functions, and convolutions using the fast Fourier transform.
+In this write-up for all the surprises I encountered trying to be clever with the making change problem, I will describe the techniques I learned along the way, including two big surprises: generating functions, and convolutions using the fast Fourier transform.
 
 # The problem
 Given some monetary amount X, can you count how many unique ways there are to combine bills and coins that add up to X?
@@ -7,27 +7,27 @@ Given some monetary amount X, can you count how many unique ways there are to co
 Change-making is a quintessential [dynamic programming problem](https://en.wikipedia.org/wiki/Change-making_problem) right alongside [matrix chain multiplication](https://en.wikipedia.org/wiki/Matrix_chain_multiplication) and any problem where the solution to the entire problem can be related to solutions of smaller sub-problems (called [optimal substructure](https://en.wikipedia.org/wiki/Optimal_substructure)). Unlike [divide-and-conquer](https://en.wikipedia.org/wiki/Divide-and-conquer_algorithm), the sub-problems of a dynamic programming solution overlap. I appreciate the examples Wikipedia uses to describe this dichotomy: quicksort and merge sort are divide-and-conquer while Djikstra's shortest path and recursively calculating a Fibonacci sequence are dynamic programming.
 
 ### Memo-y
-Given the overlap, dynamic programming uses [memoization](https://en.wikipedia.org/wiki/Memoization) so every substep is only ever computed once and then cached, and combinatorial expansion avoided. Using the example of calculating the *nth* Fibonacci number, memoization reduces the [complexity](https://en.wikipedia.org/wiki/Computational_complexity_theory) of `Fib(n)` from $O(\phi^n)$ to just $O(n)$.
+Given the overlap, dynamic programming uses [memoization](https://en.wikipedia.org/wiki/Memoization) so every substep is only ever computed once and then cached, and combinatorial expansion avoided. Using the example of calculating the *nth* Fibonacci number, memoization reduces the [big-O complexity](https://en.wikipedia.org/wiki/Computational_complexity_theory) of `Fib(n)` from $O(\phi^n)$ (where $\phi$ is the [golden ratio](https://en.wikipedia.org/wiki/Golden_ratio)) to just $O(n)$.
 
 Of course this is wonderful, what a vast improvement right?
 
 ## Hot take
-Well, sure... but in practice there's overhead to memoization. There's a cost, and it's not *just* memory: a shred of clarity is lost. Granted, this is a very minor contrivance, though I can't help but shed a tear for the elegant recursion like the classic 1970's littering PSA.
+Well, sure... but in practice there's at least *some* overhead to memoization. There's a cost, and it's not *just* memory: a shred of clarity is lost. While this is a minor contrivance, I can't help but shed a tear for the elegant recursion like the classic 1970's littering PSA.
 
-Another "problem" with that vast improvement, (for the specific case of the *nth* Fibonacci number) is that there's a simple, non-DP, non-recursive, generalized expression for calculating the value, known as [Binet's formula](https://en.wikipedia.org/wiki/Fibonacci_sequence#Relation_to_the_golden_ratio) (this is where that $\phi$ came from in the analysis above). Just two irrational constants are needed to achieve $O(1)$ complexity.
+Another "problem" with that vast improvement, (for the specific case of the *nth* Fibonacci number) is that there's a simple, non-DP, non-recursive, generalized expression for calculating the value, known as [Binet's formula](https://en.wikipedia.org/wiki/Fibonacci_sequence#Closed-form_expression) (this is where that $\phi$ came from in the analysis above). Just three irrational constants and two transcendental functions are needed to achieve $O(1)$ complexity.
 
-There is an argument to be made that the recursive approach avoids loss of precision, however, the unfortunate truth is that this too is bested by an even more fool-proof method: the humble lookup table. For all the clever approaches to calculating a Fibonacci number, there's none faster, more accurate, or more straightforward. The $O(\phi^n)$ growth means that any method used would quickly reach the limit of even 64-bit unsigned integers; a lookup table needs only 93 entries (assuming the zeroth entry starts at 0) with the final being $[92]=7,540,113,804,746,346,429$.
+$$F_n=\frac{\phi^n-\psi^n}{\sqrt5}$$
 
-While it just so happens that the Fibonacci lookup table corellates 1 to 1 with the dynamic approach, this is possibly the only case where that is true.
+An argument could be made that the recursive approach avoids loss of precision for positive integer inputs, however the truth is that for integers this is bested by an even more fool-proof method: the humble lookup table. For all the clever approaches to calculating a Fibonacci number, there's none faster, more precise, or more straightforward. The $O(\phi^n)$ growth means that any method used would quickly reach the limit of even 64-bit unsigned integers; a lookup table needs only 93 entries (assuming the zeroth entry starts at 0), the final being $[92]=7,540,113,804,746,346,429$.
 
 ### Analytic solutions
-Any mathematician or computer scientist can appreciate the joy of taking a $O(...)$ problem and deriving a $O(1)$ solution. I've heard this called an "analytic solution" before which seems appropriate, however it's not the exact same as [the mathematical definition of the same-named class of expressions](https://en.wikipedia.org/wiki/Closed-form_expression#Comparison_of_different_classes_of_expressions) since this definition necessarily involves a complexity analysis (mathematically speaking, the recursive solution is a single finite sum of ones for any given input, making it an algebraic expression). Nevertheless, I use the name here for the sake of brevity.
+Any mathematician or computer scientist can appreciate the joy of taking a $O(...)$ problem and deriving a $O(1)$ solution. I've heard this called an "analytic solution" before which seems appropriate, however it's not the exact same as [the mathematical definition of the same-named class of expressions](https://en.wikipedia.org/wiki/Closed-form_expression#Comparison_of_different_classes_of_expressions) since this definition necessarily involves a complexity analysis (mathematically speaking, the recursive solution is a single finite sum of ones for any given input, making it an algebraic expression). Nevertheless, I use the name here for the sake of brevity. While not every problem has an analytic solution, when one exists it is often the most generalized, fastest, canonically preferred means of solving such a problem.
 
-While not every problem has an analytic solution, when one exists it is often the best, fastest, canonically preferred means of solving such a problem. Having experience with the dynamic programming solution to the change-making problem, I'd always guessed there could be a more analytic solution to the problem, some sort of formula where you plug in the monetary amount and it just returns an answer never fussing with recursion or memoization. This intuition comes from a plot of the dynamic programming function.
+Having experience with the dynamic programming solution to the change-making problem, I'd always guessed there could be a more analytic solution to the problem, some sort of formula where you plug in the monetary amount and it just returns an answer never fussing with recursion or memoization. You might reason this yourself just by looking at the output of the dynamic approach for all values up to a dollar
 
-<img src="https://github.com/user-attachments/assets/ccf20e12-aaae-4f55-aafe-2afe2fe092b2" height="900" />
+<img width="800" height="494" alt="Table of change giving counts for USD" src="https://github.com/user-attachments/assets/8000bf4d-c093-4199-9c91-9560e9db7885" />
 
-You'll quickly notice (for USD) that the number of ways to make change only increases on $0.05 increments, and further still, it looks like there *could* be some sort of pattern there too for the dime and quarter and so on... The numbers grow with each denomination in surprising ways, and yes **there is an exploitable pattern**.
+You'll quickly notice (for USD) that the number of ways to make change only increases on $0.05 increments. Further still, it looks like there *could* be some sort of pattern there too for the dime and quarter and so on... The numbers grow with each denomination in surprising ways, and yes **there is an exploitable pattern**.
 
 # The analysis
 Though I'd guessed at it initially, I didn't attempt to solve it analytically before stumbling across [this YouTube video from Mathologer](https://youtu.be/VLbePGBOVeg). In it professor Burkard Polster opens with an unexpected insight that leads to a clever specialized solution.
@@ -63,7 +63,7 @@ The astute reader would notice the equations above were constructed to model ind
 
 I like the cut of your jib, hypothetical reader. It's true there's work yet to turn an intractable solution into something usable, daresay even tractable.
 
-First, we can formalize those polynomials given above. Each denomination in our hypothetical currency was expressed as a sum of powers of $x$ up to the amount to give change for. To give change for any possible amount, we can create infinite versions of the sums (called [series](https://en.wikipedia.org/wiki/Series_(mathematics))) of the form
+First, we can formalize those polynomials given above. Each denomination in our hypothetical currency was expressed as a sum of powers of $x$ up to the amount we wanted to give change for. To give change for any possible amount, we can create infinite versions of the sums (called [series](https://en.wikipedia.org/wiki/Series_(mathematics))) of the form
 
 $$\sum_{i=0}^{\infty} x^{id} = 1 + x^d + x^{2d} + x^{3d} + ...$$
 
@@ -78,14 +78,15 @@ $$\frac{1}{1-x}\frac{1}{1-x^5}\frac{1}{1-x^{10}}\frac{1}{1-x^{25}}\frac{1}{1-x^{
 While this looks more manageable, this form is only really useful as-is if we were trying to evaluate this polynomial for inputs of our synthetic variable $x$. In order for it to be of any use to find coefficients, we need to convert it back to a polynomial form. The first step would be to combine like terms.
 
 ### The unit coin
-If you noticed that all the powers of $x$ except the first are some multiple of $5$, well spotted. This is an optimization that made sense for me to implement in code for reasons that will become very obvious in a bit. First, let's rewrite that first polynomial in terms of $x^5$.
+If you noticed that all the powers of $x$ except the first are some multiple of $5$, well spotted. This is an optimization that made sense for me to implement in code for reasons that will become very obvious in a bit. To begin, let's rewrite that first polynomial in terms of $x^5$ using a little trick I like to call 'algebra'.
 
-$$\Big(\frac{1+x+x^2+x^3+x^4}{1+x+x^2+x^3+x^4}\Big)\Big(\frac{1}{1-x}\Big)=(1+x+x^2+x^3+x^4)\frac{1}{1-x^5}$$
+$$\Big(\frac{1+x+x^2+x^3+x^4}{1+x+x^2+x^3+x^4}\Big)\Big(\frac{1}{1-x}\Big)=\frac{1+x+x^2+x^3+x^4}{(1-x)(1+x+x^2+x^3+x^4)}=$$
+$$\frac{1+x+x^2+x^3+x^4}{\substack{(1+\cancel{x}+\cancel{x^2}+\cancel{x^3}+\cancel{x^4})\\-(\cancel{x}+\cancel{x^2}+\cancel{x^3}+\cancel{x^4}+x^5)}}=(1+x+x^2+x^3+x^4)\frac{1}{1-x^5}$$
 
 What this component of our polynomial product really represents is whether or not our particular currency has a 'unit coin'. That $(1+x+x^2+x^3+x^4)$ portion of this product captures the only means of achieving an exponent that is not a multiple of $5$. This corresponds exactly with the idea that if our currency doesn't have a unit coin, (the Canadian dollar for instance), that there would be no way to combine individual components of the generating functions to achieve a power of $x$ of $1$.
 
 ### The rest of the denominations
-For now, we will tuck that 'unit coin polynomial' away to focus on the *remainder* of the products
+For now, we will tuck that 'unit coin polynomial' away for now to focus on the *remainder* of the products
 
 $$\Big(\frac{1}{1-x^5}\Big)^2\frac{1}{1-x^{10}}\frac{1}{1-x^{25}}\frac{1}{1-x^{50}}\frac{1}{1-x^{100}}$$
 
@@ -101,16 +102,14 @@ Next we can take all those extracted polynomial numerators and expand them into 
 
 $$1+2x^5+4x^{10}+6x^{15}+9x^{20}+13x^{25}+...+980x^{195}+985x^{200}+985x^{205}+980x^{210}+...+13x^{380}+9x^{385}+6x^{390}+4x^{395}+2x^{400}+x^{405}$$
 
-This polynomial has 82 terms! Notice that since all of the starting generator functions' coefficients were symmetric, the resulting polynomial's coefficients are also perfectly symmetric.
-
-You *could* multiply in the 'unit coin polynomial' now, but the effect would be to "stretch" the 'remainder polynomial' out, duplicating its coefficients by a factor of the number of terms of the 'unit coin polynomial'. **It is in this way that extracting that 5 term unit coin polynomial lets us contract a 410 term polynomial by a factor of 5 into an 82 term polynomial.** This is an important optimization as we will see later.
+You *could* multiply in the 'unit coin polynomial' now, but the effect would be to "stretch" the 'remainder polynomial' out, duplicating its coefficients by a factor of the number of terms of the 'unit coin polynomial'. **It is in this way that extracting that 5 term unit coin polynomial lets us contract a 406 term polynomial into an 82 term polynomial.** This is a necessary optimization as we will see later.
 
 ### Generalized geometric sum
 There is also a more generalized form of the geometric sum above which uses [binomial coefficient notation](https://en.wikipedia.org/wiki/Binomial_coefficient), a version raised to a power $n$ like this
 
-$$\sum_{i=0}^{\infty}{{n-1+i}\choose{n-1}}x^i={{n-1}\choose{n-1}}+{{n}\choose{n-1}}x+{{n+1}\choose{n-1}}x^2+...=\frac{1}{(1-x)^n}$$
+$$\sum_{i=0}^{\infty}\binom{n-1+i}{n-1}x^i=\binom{n-1}{n-1}+\binom{n}{n-1}x+\binom{n+1}{n-1}x^2+\binom{n+2}{n-1}x^3+...=\frac{1}{(1-x)^n}$$
 
-again only for $-1<x<1$. This formula looks like a nice fit for the polynomial product above if we swap $x$ for $x^{100}$ and $n=6$. For our initial case of US coinage, we finally, *finally* end with the product of three things:
+again only for $-1<x<1$. This formula looks like a nice fit for the polynomial product above if we swap $x$ for $x^{100}$ and $n=6$. For our initial case of US coinage, we finally, *finally* end with the product of three polynomials which we will call the "factors" of our generating function:
 1. the finite 5 term 'unit coin polynomial'
 2. the finite 81 term 'remainder polynomial'
 3. an infinite polynomial sum
@@ -119,30 +118,32 @@ Altogether, it looks like this
 
 $$(1+x+x^2+x^3+x^4)\times$$
 $$(1+2x^5+4x^{10}+6x^{15}+9x^{20}+13x^{25}+18x^{30}+...+x^{405})\times$$
-$$[{5\choose5}+{6\choose5}x^{100}+{7\choose5}x^{200}+{8\choose5}x^{300}+{9\choose5}x^{400}+...]$$
+$$[\binom55+\binom65x^{100}+\binom75x^{200}+\binom85x^{300}+\binom95x^{400}+...]$$
 
-## How to use it
-With the above, we need to only consider the values of coefficients that add up to a power of $x$ that matches our desired input monetary amount. For example, the video gives $4.00 USD, or 400 cents, so this is equivalent to finding all possible combinations of terms that multiply to $x^{400}$. There are many relevant terms, and here I will isolate them
+## How to use this generating function
+With the above in hand, in order to determine how many ways there are to add up coinage to reach a desired amount, we imagine what it takes to multiply those factors together, just the [FOIL method](https://en.wikipedia.org/wiki/FOIL_method) with extra steps. Essentially, if we *were* to perform the method, each step would look like selecting one term out of each of the polynomial factors, multiplying the coefficients and adding the exponents up. The point, however, is to avoid the FOIL itself, and so we must reason "if we were to have done so, which of the terms of our polynomial factors would multiply to produce a power of $x$ that matches our desired input monetary amount?"
+
+For example, the Mathologer video uses $4.00 USD, or 400 cents, so this is equivalent to finding all possible combinations of terms that multiply to $x^{400}$. There are many relevant terms, and here I will isolate them
 
 $$(1+...)\times$$
 $$(1+...+287x^{100}+...+985x^{200}+...325x^{300}+...2x^{400}+...)\times$$
-$$[{5\choose5}+{6\choose5}x^{100}+{7\choose5}x^{200}+{8\choose5}x^{300}+{9\choose5}x^{400}+...]$$
+$$[\binom55+\binom65x^{100}+\binom75x^{200}+\binom85x^{300}+\binom95x^{400}+...]$$
 
-For all possible input amounts, there is always one and *only* one relevant term in the first polynomial, and since all the rest of the powers of x are multiples of 5, all inputs can be rounded down to the nearest 5 and the unit polynomial can be ignored entirely. Notice how the answer can be given by multiplying and combining the remaining visible terms
+For all possible input amounts, there is always one and only one relevant term in the first polynomial, so it can be completely ignored for now. Notice how the answer can be given by multiplying and combining the remaining visible terms
 
-$$1{9\choose5}x^{400}+287x^{100}{8\choose5}x^{300}+985x^{200}{7\choose5}x^{200}+325x^{300}{6\choose5}x^{100}+{5\choose5}2x^{400}$$
+$$1\times\binom95x^{400}+287x^{100}\times\binom85x^{300}+985x^{200}\times\binom75x^{200}+325x^{300}\times\binom65x^{100}+2x^{400}\times\binom55$$
 
-The variables all combine to $x^{400}$ except it isn't relevant anymore so we can remove it for clarity
+the $x$'s all combine to $x^{400}$, as desired. Now that $x$ has served its purpose now so we can remove it for clarity
 
-$${9\choose5}+287{8\choose5}+985{7\choose5}+325{6\choose5}+2{5\choose5}=38,835$$
+$$\binom95+287\binom85+985\binom75+325\binom65+2\binom55=38,835$$
 
-and therefore there are 38,835 ways to give change for $4.00 USD. That's it! Having a finite polynomial up front allows us to limit the search for coefficients in the infinite polynomial. For *any* non-negative integer amount, to find the number of ways to give change, you only need to find all the ways to combine these terms of the infinite polynomial **over the range of the finite polynomial**, and it extends in a very manageable way.
+and now we can easily see there are 38,835 ways to give change for $4.00 USD. That's it! Having a finite polynomial up front allows us to limit the search for coefficients in the infinite polynomial. For *any* non-negative integer amount, to find the number of ways to give change, you only need to find all the ways to combine these terms of the infinite polynomial **over the range of the finite polynomial**, and it extends in a very manageable way.
 
 The Mathologer video shows that the formula for whole dollar amounts greater than 3 is
 
-$$\\#(k\$)={k+5\choose5}+287{k+4\choose5}+985{k+3\choose5}+325{k+2\choose5}+{k+1\choose5}$$
+$$\\#(k\\$)=\binom{k+5}{5}+287\binom{k+4}{5}+985\binom{k+3}{5}+325\binom{k+2}{5}+\binom{k+1}{5}$$
 
-In code if we combined the two finite polynomials it would look like:
+In C++, if we combined the two finite polynomials into a single `coefficients` vector, it would look like:
 
 ```cpp
 uint64_t analyticWaysToGiveChange(uint64_t amount) const {
@@ -154,17 +155,16 @@ uint64_t analyticWaysToGiveChange(uint64_t amount) const {
 }
 ```
 
-In my code above, `nCk(n, k)` is ${n \choose k}$. This works for any amount, but eagle-eyed reeders would notice that there are a lot of magic numbers in there and that I misspelled 'readers'. There's a few more loose ends to tie up before reaching a final algorithm.
+Here, `nCk(n, k)` is the binomial coefficient $\binom{n}{k}$. This works for any amount, but eagle-eyed readers wuold notice that there's a handful of magic numbers in there and that I misspelled 'would'. Where did those `5`'s and `100`'s come from? There's a few more loose ends to tie up before reaching a final algorithm.
 
 ## Loose ends
-
-### The skeleton in the closet
-Remember earlier when a hypothetical reader pointed out that "straight polynomial multiplication is $O(d_1d_2)$"? These are sparse polynomials, meaning they contain low information, but multiplying is still not trivial. Some shortcuts can be taken, but ultimately, it's just a much longer form of FOIL.
+### That big skeleton in the closet
+Remember earlier when a hypothetical reader pointed out that "straight polynomial multiplication is $O(d_1d_2)$"? These are sparse polynomials, meaning they contain low information, but multiplying is still not trivial. Some shortcuts can be taken, but ultimately, it's FOIL with extra steps.
 
 This means that the setup for building the finite portion of the polynomial is not so innocent as it might seem.
 
-### Naming constants
-In the snippet above, I'll give a few names to these numbers. First, the `5` is just 1 less than the number of different denominations. There is a subtlety to that `100`, however, it's not merely the largest denomination. In fact it's a constant that's crucial to the construction of the initial finite portion of the polynomial that was simply emergent from the initial setup.
+### The magic numbers
+I'll give a few names to the numbers from the snippet above. First, the `5` is just one less than the number of different denominations. There is a subtlety to the `100`, however, it's not merely the largest denomination. In fact it's a constant that's crucial to the construction of the initial finite portion of the polynomial that was simply emergent from the initial setup.
 
 Imagine a version without the dollar or half dollar coins. In this setup, our generating functions will ultimately reach the form of
 
@@ -174,24 +174,25 @@ and when we try to unify all these together the way we did before, we'll find th
 
 $$\frac{1+x+...+x^{49}}{1-x^{50}}\frac{1+x^5+...+x^{45}}{1-x^{50}}\frac{1+x^{10}+...+x^{40}}{1-x^{50}}\frac{1+x^{25}}{1-x^{50}}$$
 
-That exponent is the [least common multiple](https://en.wikipedia.org/wiki/Least_common_multiple) of all the different denominations. The bigger the LCM and the more denominations you have, the bigger the finite polynomial is. In fact, it can be said that the size of the finite polynomial is directly dependant on the number of denominations and how many unique factors they all share. The worst case is when all the denominations of a hypothetical currency are coprime to each other.
+That exponent is the [least common multiple](https://en.wikipedia.org/wiki/Least_common_multiple) of all the different denominations. The bigger the LCM and the more denominations you have, the bigger the finite polynomial is. In fact, it can be said that the size of the finite polynomial is directly dependant on the number of denominations and how many unique factors they all share. The worst case scenario would be when all the denominations of a hypothetical currency are coprime to each other.
 
 ### The GCD
 In the case of the Canadian and United States dollars, without their pennies, there would be no way to give exact change for amounts between 5 cent totals. However this is not true for the Euro, where with its mighty 2 cent and 5 cent coins there's only two denominations that cannot be achieved without its penny, €0.01 and €0.03.
 
-This idea can be captured by finding the [greatest common divisor](https://en.wikipedia.org/wiki/Greatest_common_divisor) of all the denominations greater than $1$. If the GCD is still $1$ then there may be only a few gaps, however the GCD being greater than one leads to two major consequences. First, that's what gave the USD its 5 cent steps, where the counts can only differ between the $0.05 boundaries. The second follows from the first, and it is that this pattern can be exploited to reduce the size of the finite polynomial, making the multiplications faster.
+This idea can be captured by finding the [greatest common divisor](https://en.wikipedia.org/wiki/Greatest_common_divisor) of all the denominations greater than $1$. If the GCD is still $1$ then there may be only a few gaps, however the GCD being greater than one leads to two major consequences. First, that's what gave the USD its 5 cent steps in the table at the start of this article, where the counts can only differ between the $0.05 boundaries. The second follows from the first, and it is that this pattern can be exploited to reduce the size of the finite polynomial, making the multiplications faster.
 
-I find this last fact somewhat amusing considering that this is a speedup employed earlier to make the math easier to do by hand. In similar situations usually it is a complication to employ such tricks as computers can often be faster than such optimizations through sheer brute force.
+I find this last fact somewhat amusing considering that this is the same speedup employed earlier to make the math easier to do by hand. Typically it is often a complication to employ such tricks as computers can often be faster than such optimizations through sheer brute force.
 
-This is unfortunately not one of those times. To give a taste of some numbers, when constructing the finite polynomial for the USD, our polynomial can be contracted down to a manageable ~16,000 coefficients. The Euro, however, which cannot be contracted since its GCD is 1 cent, has more than 1.4 million coefficients in its finite polynomial.
+This is unfortunately not one of those times, it is absolutely necessary. To give a taste of some numbers, when constructing the finite polynomial for every coin and bill of the USD, our polynomial can be contracted down to a manageable ~16,000 coefficients. The Euro, however, which cannot be contracted since its GCD is 1 cent, has more than 1.4 million coefficients in its finite polynomial.
 
-## Why would you think to do this in order to solve this problem?
-The Mathologer video credits Graham, Knuth, and Patashnik's [*Concrete Mathematics*](https://en.wikipedia.org/wiki/Concrete_Mathematics) for inspiring the use of generating functions and indeed chapter 7.1 is all about this *exact* application for generating functions. While all of those authors are accomplished mathematicians, the preface of the book explains the provenance for its material reaching even further back in time.
+## Why would you think to use these infinite polynomials in order to solve a counting problem?
+The Mathologer video credits Graham, Knuth, and Patashnik's [*Concrete Mathematics*](https://en.wikipedia.org/wiki/Concrete_Mathematics) for inspiring the use of generating functions and indeed section 7.1 is all about this *exact* application for generating functions. While all of those authors are accomplished mathematicians, the preface of the book explains the provenance for its material reaching even further back in time.
 
-Even the aforementioned 3Blue1Brown video admits difficulty finding a way to motivate how someone might discover generating functions on their own. Personally, I think the spark of inspiration lies in the doing: in order to even have a chance to make connections one must first know of something to connect. Though I had seen that 3B1B video before, undertaking this solution truly galvanized them for me.
+Even the aforementioned 3Blue1Brown video admits difficulty finding a way to motivate how someone might discover generating functions on their own. Personally, I think the spark of inspiration lies in the doing: in order to even have a chance to make this sort of spontaneous connection one must first be familiar with the concepts to connect. Someone very practiced in polynomial multiplication had to be asked a combinatorics counting question at one point and notice that the solution when worked out by hand *felt* eerily similar.
 
 ## The code
 With all those changes above, we arrive at more or less the final version I use in my solution
+
 ```cpp
 uint64_t analyticWaysToGiveChange(uint64_t amount) const {
     if (!m_hasUnitValue && amount % m_gcd != 0ul)
@@ -207,7 +208,12 @@ uint64_t analyticWaysToGiveChange(uint64_t amount) const {
 }
 ```
 
-In this version, at startup we split the unit value (if it exists) into the condensed form in the polynomial and save just a single boolean to handle it with a quick if statement up front. Next we pick the "choose" portion of our binomial coefficient, `k` which is the same for all terms. Now we need to know when to stop searching the infinite portion of the polynomial, this needs to happen when we run out of finite polynomial coefficients, but since we're potentially using a condensed polynomial, we just multiply it by the GCD, the scaling factor. This factor shows up again to ensure we index the right coefficient. To wrap it all up, the LCM is the step for the exponents in the infinite polynomial, so this is the step in the loop.
+The important changes are
+1. At startup we reduce the unit value (if it exists) down to a simple boolean that we handle when counting, allowing us to 'condense' the polynomial which would otherwise contain loads of duplicates.
+2. We save the "choose" portion of our binomial coefficient, `k` which is the same for all terms.
+3. We need to know when to stop searching the infinite portion of the polynomial. This happens when we exceed the number of finite polynomial coefficients. Since we're potentially using a 'condensed' polynomial, we get the true length by multiplying the bound by the GCD, which is how much we condensed it.
+4. The GCD shows up again when we access the coefficients of the polynomial to ensure we index the right one.
+5. Finally, the LCM is the step for the exponents in the infinite polynomial, so this is the step for the summation loop as well.
 
 ## Initial results
 Very, very promising... so long as you do not include the "startup" cost of multiplying the polynomials together. I was impressed by just how fast it was; so much that aggregate timing is required to measure the analytic solution, even for very large inputs that take the dynamic approach roughly four or five orders of magnitude longer.
@@ -221,16 +227,17 @@ The Fourier Transform is so interrelated with so many areas of mathematics that 
 
 Though I've used the FFT before, this is the first time I've written one myself. This is what I would have liked to know before using the FFT.
 
-## *Quick* disambiguation of topics from Fourier transforms for those unfamiliar
+<details><summary><b><i>Quick</i> disambiguation of topics from Fourier transforms for those unfamiliar</b></summary>
 
-### Fourier series and analysis
+## Fourier series and analysis
 A [Fourier series](https://en.wikipedia.org/wiki/Fourier_series) is the summation of signals, (sinusoids, frequencies, etc.) used in [Fourier analysis](https://en.wikipedia.org/wiki/Fourier_analysis) which is what most people likely think about when they think of Joseph Fourier. These infinite sums of sinusoidal signals can be truncated to approximate arbitrary functions, evaluating only finitely many. If you are familiar with [animations involving vectors aligned tip-to-tail spinning to trace out complex patterns](https://youtu.be/-qgreAUpPwM), these are accomplished using Fourier series approximations.
 
 The series and its function approximations can be created using the Fourier transform.
 
-### The (continuous) Fourier transform
+## The (continuous) Fourier transform
 The [Fourier transform](https://en.wikipedia.org/wiki/Fourier_transform) is a formula used to express a continuous 'input' function $f(x)$ as a continuous 'output' function $\widehat{f}(\xi)$ which describes the *frequencies* of the input.
 
+<details><summary><b>The gist of how the Fourier transform works</b></summary>
 The formula for the transform looks like
 
 $$\widehat{f}(\xi)=\int_{-\infty}^\infty f(x)e^{-i2\pi\xi x}dx$$
@@ -238,28 +245,30 @@ $$\widehat{f}(\xi)=\int_{-\infty}^\infty f(x)e^{-i2\pi\xi x}dx$$
 The transform works by using [Euler's formula](https://en.wikipedia.org/wiki/Euler's_formula) to "wind" the input around the origin of the complex plane and finding the "center of mass" so to speak (the integral). That "center of mass" for a given $\xi$ (greek xi, the frequency of the winding) is $\widehat{f}(\xi)$. By changing $\xi$, the transform "winds" $f(x)$ tighter or more loosely and the "center of mass" moves, $\widehat{f}(\xi)$ changes. When $\widehat{f}(\xi)$ is very near the origin, $f(x)$ has low correlation with this particular "winding", $\xi$, and when the center is far from the origin, there is high correlation.
 
 For an animated explanation of the above, I recommend [this 3Blue1Brown video](https://youtu.be/spUNpyF58BY) for FT novices like I was.
+</details>
 
-While the domain of $f(x)$ can be either $\mathbb{R}$ or $\mathbb{C}$, $\widehat{f}(\xi)$ is a complex output; the magnitude encodes the strength of the correlation, and the [argument](https://en.wikipedia.org/wiki/Argument_(complex_analysis)) of $\widehat{f}(\xi)$ encodes the phase. If your data are all in phase, however, it is common to discard the imaginary component.
+While the domain of $f(x)$ can be either $\R$ or $\Complex$, $\widehat{f}(\xi)$ is a complex output; the magnitude encodes the strength of the correlation, and the [argument](https://en.wikipedia.org/wiki/Argument_(complex_analysis)) of $\widehat{f}(\xi)$ encodes the phase. If your data are all in phase, however, it is common to discard the imaginary component.
 
-### The discrete Fourier transform
+## The discrete Fourier transform
 The [Discrete Fourier transform](https://en.wikipedia.org/wiki/Discrete_Fourier_transform) (conventionally denoted calligraphic F, $\mathcal{F}$) does the same thing as its continuous counterpart using discrete inputs (usually called samples) to extract discrete frequencies. The DFT is effectively the same formula as the FT but swapping an integral for a summation, and operating on discrete (usually *finite*) inputs instead of continuous functions. The number of discrete frequencies it can extract is equivalent to the number of input samples.
 
 While the continuous Fourier transform is more commonly thought of as a **formula**, the DFT can be considered as both a formula and an **algorithm**. A DFT computes the sum of $N$ inputs "evaluated" at $N$ distinct points to yield $N$ outputs. A naive approach to "evaluate" $N$ inputs at $N$ points would be $O(N^2)$.
 
-### Inverse DFT
+## Inverse DFT
 This is a function that does what it says on the tin, in particular it satisfies the following: $\mathcal{F}^{-1}(\mathcal{F}(f))=f$ for input function $f$. When *computing* $\mathcal{F}$ and $\mathcal{F}^{-1}$, (perhaps surprisingly) there is very little distinction between the two (just one exponent). For this reason they are sometimes treated as the same operation, particularly in the context of computing. This remains true for the FFT.
 
-### The FFT
+## The FFT
 The [fast Fourier transform](https://en.wikipedia.org/wiki/Fast_Fourier_transform) is a family of algorithms to calculate the DFT. While the FFT is still named after Joseph Fourier, the algorithms were first invented some time in the 19th or 20th century well after his death.
 
 The simplest and most common version is [the Cooley-Tukey FFT](https://en.wikipedia.org/wiki/Cooley–Tukey_FFT_algorithm) which uses a divide-and-conquer approach to exploit symmetry by evaluating the inputs on the [roots of unity](https://en.wikipedia.org/wiki/Root_of_unity). What's clever is that **using the roots of unity as its evaluation points is what induces that symmetry**. The intuition for how this works can be seen in [this video from Reducible](https://youtu.be/h7apO7q16V0), but the gist is that it takes the $O(N^2)$ run time down to $O(N\log(N))$.
 
 In practice, the FFT is a complete drop-in replacement for the DFT in many applications; it is rare to find a use-case where the general DFT is necessary over the FFT.
+</details>
 
 ## The FFT and polynomials
-I was always so used to the Fourier transform being the "signal processing" function that when I first learned that it could be used to multiply polynomials, I was a little surprised. Now for me, it is practically the definition of what the FFT is. To understand how, first we need to know two quirks about polynomial multiplication.
+I was always so used to the Fourier transform being the "signal processing" function that when I first learned that it could be used to multiply polynomials, I was a little surprised. Now, it is practically the definition of what the FFT allows for. To understand how, first we need to know two quirks about polynomial multiplication.
 
-### Linearity
+### Linearity of multiplication
 For two polynomials $f(x)$ and $g(x)$ and any input value $i$, multiplying the outputs $f(i)$ and $g(i)$ together is equivalent to evaluating on the combined multiplied polynomial, e.g. $f(x)\times g(x)=(f\times g)(x)$.
 
 ### Unique interpolation
