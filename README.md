@@ -247,7 +247,7 @@ The transform works by using [Euler's formula](https://en.wikipedia.org/wiki/Eul
 For an animated explanation of the above, I recommend [this 3Blue1Brown video](https://youtu.be/spUNpyF58BY) for FT novices like I was.
 </details>
 
-While the domain of $f(x)$ can be either $\R$ or $\Complex$, $\widehat{f}(\xi)$ is a complex output; the magnitude encodes the strength of the correlation, and the [argument](https://en.wikipedia.org/wiki/Argument_(complex_analysis)) of $\widehat{f}(\xi)$ encodes the phase. If your data are all in phase, however, it is common to discard the imaginary component.
+While the domain of $f(x)$ can be either real or complex, $\widehat{f}(\xi)$ has a complex range; the magnitude encodes the strength of the correlation, and the [argument](https://en.wikipedia.org/wiki/Argument_(complex_analysis)) of $\widehat{f}(\xi)$ encodes the phase. If your data are all in phase, however, it is common to discard the imaginary component.
 
 ## The discrete Fourier transform
 The [Discrete Fourier transform](https://en.wikipedia.org/wiki/Discrete_Fourier_transform) (conventionally denoted calligraphic F, $\mathcal{F}$) does the same thing as its continuous counterpart using discrete inputs (usually called samples) to extract discrete frequencies. The DFT is effectively the same formula as the FT but swapping an integral for a summation, and operating on discrete (usually *finite*) inputs instead of continuous functions. The number of discrete frequencies it can extract is equivalent to the number of input samples.
