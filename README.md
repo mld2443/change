@@ -81,7 +81,7 @@ While this looks more manageable, this form is only really useful as-is if we we
 If you noticed that all the powers of $x$ except the first are some multiple of $5$, well spotted. This is an optimization that made sense for me to implement in code for reasons that will become very obvious in a bit. To begin, let's rewrite that first polynomial in terms of $x^5$ using a little trick I like to call 'algebra'.
 
 $$\Big(\frac{1+x+x^2+x^3+x^4}{1+x+x^2+x^3+x^4}\Big)\Big(\frac{1}{1-x}\Big)=\frac{1+x+x^2+x^3+x^4}{(1-x)(1+x+x^2+x^3+x^4)}=$$
-$$\frac{1+x+x^2+x^3+x^4}{\substack{(1+\cancel{x}+\cancel{x^2}+\cancel{x^3}+\cancel{x^4})\\-(\cancel{x}+\cancel{x^2}+\cancel{x^3}+\cancel{x^4}+x^5)}}=(1+x+x^2+x^3+x^4)\frac{1}{1-x^5}$$
+$$\frac{1+x+x^2+x^3+x^4}{(1+x+x^2+x^3+x^4)-(x+x^2+x^3+x^4+x^5)}=(1+x+x^2+x^3+x^4)\frac{1}{1-x^5}$$
 
 What this component of our polynomial product really represents is whether or not our particular currency has a 'unit coin'. That $(1+x+x^2+x^3+x^4)$ portion of this product captures the only means of achieving an exponent that is not a multiple of $5$. This corresponds exactly with the idea that if our currency doesn't have a unit coin, (the Canadian dollar for instance), that there would be no way to combine individual components of the generating functions to achieve a power of $x$ of $1$.
 
