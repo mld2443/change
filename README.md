@@ -16,7 +16,7 @@ Well, sure... but in practice there's at least *some* overhead to memoization. T
 
 Another "problem" with that vast improvement, (for the specific case of the *nth* Fibonacci number) is that there's a simple, non-DP, non-recursive, generalized expression for calculating the value, known as [Binet's formula](https://en.wikipedia.org/wiki/Fibonacci_sequence#Closed-form_expression) (this is where that $\phi$ came from in the analysis above). Just three irrational constants and two transcendental functions are needed to achieve $O(1)$ complexity.
 
-$$F_n=\frac{\phi^n-\psi^n}{\sqrt{5}}$$
+$$F_n=\frac{\phi^n-\psi^n}{\sqrt5}$$
 
 An argument could be made that the recursive approach avoids loss of precision for positive integer inputs, however the truth is that for integers this is bested by an even more fool-proof method: the humble lookup table. For all the clever approaches to calculating a Fibonacci number, there's none faster, more precise, or more straightforward. The $O(\phi^n)$ growth means that any method used would quickly reach the limit of even 64-bit unsigned integers; a lookup table needs only 93 entries (assuming the zeroth entry starts at 0), the final being $[92]=7,540,113,804,746,346,429$.
 
